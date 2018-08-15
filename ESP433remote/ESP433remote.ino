@@ -6,31 +6,51 @@
 
 #include <RCSwitch.h>
 
-RCSwitch mySwitch = RCSwitch();
+RCSwitch receiveSwitch = RCSwitch();
+RCSwitch transmitSwitch = RCSwitch();
 
 void setup() {
   Serial.begin(9600);
   Serial.println("Starting up");
-  mySwitch.enableReceive(0);  // Receiver on interrupt 0 => that is pin #2
+  receiveSwitch.enableReceive(2);  // Receiver on interrupt 0 => that is pin D4
+
+  // Transmitter is connected to ESP Pin D2   
+  transmitSwitch.enableTransmit(4);
+
+  // Optional set pulse length.
+  // receiveSwitch.setPulseLength(320);
+  
+  // Optional set protocol (default is 1, will work for most outlets)
+  // receiveSwitch.setProtocol(2);
+  
+  // Optional set number of transmission repetitions.
+  // receiveSwitch.setRepeatTransmit(15);
 }
 
 void loop() {
-  if (mySwitch.available()) {
+  if (receiveSwitch.available()) {
     
-    int value = mySwitch.getReceivedValue();
+    int value = receiveSwitch.getReceivedValue();
     
     if (value == 0) {
       Serial.print("Unknown encoding");
     } else {
       Serial.print("Received ");
-      Serial.print( mySwitch.getReceivedValue() );
+      Serial.print( receiveSwitch.getReceivedValue() );
       Serial.print(" / ");
-      Serial.print( mySwitch.getReceivedBitlength() );
+      Serial.print( receiveSwitch.getReceivedBitlength() );
       Serial.print("bit ");
       Serial.print("Protocol: ");
-      Serial.println( mySwitch.getReceivedProtocol() );
+      Serial.println( receiveSwitch.getReceivedProtocol() );
     }
 
-    mySwitch.resetAvailable();
+    receiveSwitch.resetAvailable();
+  }
+  if (Serial.available() > 0) {
+    Serial.println("Transmitting");
+    transmitSwitch.send(1361, 24);
+    delay(1000);  
+    transmitSwitch.send(1364, 24);
+    delay(1000);
   }
 }
