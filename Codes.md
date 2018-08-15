@@ -12,3 +12,5 @@ Config: All 5 switches on `ON`
 | D      | 5393 | 5396 |
 
 Afterwards, `5471`is sent (As confirmation?).
+
+Codes are `24bit` and rc-switch protocol `1`
